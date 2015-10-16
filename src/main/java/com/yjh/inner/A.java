@@ -16,6 +16,11 @@ public class A {
         }
     }
 
+    public static int testI() {
+        int i = 0;
+        return ++i;
+    }
+
 
     public static void main(String[] args) throws Exception {
         //初始化A时，并不会初始化A的静态内部类
@@ -23,5 +28,6 @@ public class A {
 //        new A();
         Class<?> bc = B.class; //不会引起初始化
         int b = B.b; //会引起初始化
+        System.out.println(testI());
     }
 }
