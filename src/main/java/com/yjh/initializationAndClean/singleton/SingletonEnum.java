@@ -1,4 +1,4 @@
-package com.yjh.singleton;
+package com.yjh.initializationAndClean.singleton;
 
 /**
  * Able to use serialize directly, and don't worry about Class.newInstance().

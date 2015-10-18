@@ -1,11 +1,11 @@
-package com.yjh.singleton;
+package com.yjh.initializationAndClean.singleton;
 
 /**
  * difference model of singleton
  *
  * Created by yjh on 15-10-16.
  */
-public class Singleton {
+public final class Singleton {
     /**
      * hungry man
      */
@@ -24,7 +24,7 @@ public class Singleton {
     public static Singleton getNewInstance2() { return singleton2;}
 
     //hungry man model3:
-    private static Singleton singleton3 = null;
+    private final static Singleton singleton3;
 
     static {
         singleton3 = new Singleton();
