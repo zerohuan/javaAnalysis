@@ -1,4 +1,4 @@
-package com.yjh.equalAndHash;
+package com.yjh.objectCommon;
 
 /**
  * four contract of equivalence relation
