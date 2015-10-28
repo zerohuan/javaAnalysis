@@ -1,21 +1,23 @@
 package com.exercise;
 
 /**
+ *
+ *
  * Created by yjh on 15-10-28.
  */
-public class Solution {
+public class StackWithMin {
     private int val;
-    private Solution next;
-    private Solution min;
+    private StackWithMin next;
+    private StackWithMin min;
 
 
     public void push(int node) {
-        Solution temp = next;
-        next = new Solution();
+        StackWithMin temp = next;
+        next = new StackWithMin();
         next.val = node;
         next.next = temp;
-        Solution tempM = min;
-        Solution prev = null;
+        StackWithMin tempM = min;
+        StackWithMin prev = null;
         while(tempM != null && tempM.val < node) {
             prev = tempM;
             tempM = tempM.min;
@@ -30,10 +32,10 @@ public class Solution {
 
     public void pop() {
         if(next != null) {
-            Solution n = next;
+            StackWithMin n = next;
             next = next.next;
-            Solution temp = min;
-            Solution prev = null;
+            StackWithMin temp = min;
+            StackWithMin prev = null;
             while(temp != n) {
                 prev = temp;
                 temp = temp.min;
@@ -62,7 +64,7 @@ public class Solution {
     }
 
     public void print() {
-        Solution temp = next;
+        StackWithMin temp = next;
         while (temp != null) {
             System.out.print(temp.val + " ");
             temp = temp.next;
@@ -70,7 +72,7 @@ public class Solution {
     }
 
     public static void main(String[] args) {
-        Solution solution = new Solution();
+        StackWithMin solution = new StackWithMin();
         solution.push(3);
         System.out.println(solution.min.val);
         solution.push(4);
