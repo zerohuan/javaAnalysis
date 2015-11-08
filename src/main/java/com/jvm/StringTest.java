@@ -37,7 +37,10 @@ public class StringTest {
     }
 
     public static void main(String[] args) {
+        String o = "xxx123";
         String s = new StringBuilder("xxx").append("123").toString();
-        System.out.println(s == s.intern());
+        String t = new String("xxx123");
+        String t2 = new String("xxx1234");
+        System.out.println(t2 == t2.intern());
     }
 }
