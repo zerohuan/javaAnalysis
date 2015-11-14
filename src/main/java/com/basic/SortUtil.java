@@ -155,37 +155,47 @@ public class SortUtil {
         }
     }
 
+    /**
+     * 三数中值分割
+     */
+    public static int median3(int[] input, int left, int right) {
+        int center = (left + right) >> 1;
+
+        if(input[left] > input[right])
+            swap(input, left, right);
+        if(input[left] > center)
+            swap(input, left, center);
+        if(input[center] > right)
+            swap(input, center, right);
+        swap(input, center, right - 1);
+
+        return input[right - 1];
+    }
+    //小于cutOff不使用快排使用插入排序
+    private static final int cutOff  = 3;
     public static void quickSort(int[] input) {
         if(!checkInput(input))
             return;
         quickSort(input, 0, input.length - 1);
     }
-
-    public static void quickSort(int[] num, int l, int h) {
-        if(num == null)
-            return;
-        if(l < h) {
-            int m = partition(num, l, h);
-            quickSort(num, l, m - 1);
-            quickSort(num, m + 1, h);
-        }
-    }
-
-    public static int partition(int[] num, int l, int h) {
-        int x = num[h];
-        int j = l-1, i = l;
-        while(i < h) {
-            if(num[i] < x) {
-                j++;
-                if(i != j) {
-                    swap(num, i, j);
-                }
+    public static void quickSort(int[] input, int left, int right) {
+        if(left + cutOff <= right) {
+            int i = left, j = right - 1;
+            int pivot = median3(input, left, right);
+            for(;;) {
+                while(input[++i] < pivot){}
+                while(input[--j] > pivot){}
+                if(i < j)
+                    swap(input, i, j);
+                else
+                    break;
             }
-            i++;
+            swap(input, i, right - 1);
+            quickSort(input, left, i - 1);
+            quickSort(input, i + 1, right);
+        } else {
+            insertionSort(input);
         }
-        if(j != h)
-            swap(num, ++j, h);
-        return j;
     }
 
     public static void swap(int[] num, int i, int j) {
@@ -230,5 +240,11 @@ public class SortUtil {
         test(SortUtil::mergeSort, case2);
         test(SortUtil::mergeSort, Arrays.copyOf(case3, case3.length));
 
+        System.out.println("快速排序");
+        test(SortUtil::quickSort, case1);
+        test(SortUtil::quickSort, case2);
+        test(SortUtil::quickSort, Arrays.copyOf(case3, case3.length));
+
     }
+
 }
