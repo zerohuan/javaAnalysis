@@ -1,5 +1,7 @@
 package com.exercise;
 
+import com.basic.SortUtil;
+
 import java.util.*;
 
 /**
@@ -92,8 +94,56 @@ public class LeastKNum {
         return i;
     }
 
+    //选择第k小的值
+    public static void swap(int[] input, int i, int j) {
+        int temp = input[i];
+        input[i] = input[j];
+        input[j] = temp;
+    }
+    public static int median3(int[] input, int left, int right) {
+        int center = (left + right) >> 1;
+        if(input[left] > input[right])
+            swap(input, left, right);
+        if(input[left] > input[center])
+            swap(input, left, center);
+        if(input[center] > input[right])
+            swap(input, center, right);
+        swap(input, center, right - 1);
+        return input[right - 1];
+    }
+
+    private static final int CutOff = 3;
+    public static int QSelect(int[] input, int k) {
+        if(input == null || input.length < k || k <= 0)
+            throw new RuntimeException("参数k必须小于等于数组长度");
+        QSelect(input, k - 1, 0, input.length - 1);
+        return input[k - 1];
+    }
+    public static void QSelect(int[] input, int k, int left, int right) {
+        if(left + CutOff <= right) {
+            int i = left, j = right - 1;
+            int pivot = median3(input, left, right);
+            for(;;) {
+                while(input[++i] < pivot){}
+                while(input[--j] > pivot){}
+                if(i < j)
+                    swap(input, i, j);
+                else
+                    break;
+            }
+            swap(input, i, right - 1);
+            if(k < i)
+                QSelect(input, k, left, i - 1);
+            else if(k > i)
+                QSelect(input, k, i + 1, right);
+        } else {
+            SortUtil.insertionSort(input, left, right); //如果不要排序，就不用加一句
+        }
+    }
+
     public static void main(String[] args) {
         int[] num = {4,5,1,6,2,7,3,8};
-        System.out.println(GetLeastNumbers_Solution1(num, 4));
+        System.out.println(QSelect(num, 3));
+        System.out.println(Arrays.toString(num));
     }
 }

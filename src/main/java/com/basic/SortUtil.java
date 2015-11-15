@@ -29,6 +29,18 @@ public class SortUtil {
         }
     }
 
+    public static void insertionSort(int[] input, int left, int right) {
+        if(!checkInput(input))
+            return;
+        int j,i;
+        for(i = left; i <= right; ++i) {
+            int tmp = input[i];
+            for(j = i; j > 0 && input[j - 1] > tmp; --j)
+                input[j] = input[j - 1];
+            input[j] = tmp;
+        }
+    }
+
     /**
      * 希尔排序
      * @param input
@@ -204,6 +216,167 @@ public class SortUtil {
         num[j] = temp;
     }
 
+    /**
+     * 计数排序
+     * @param input 所有元素小于10的数组
+     */
+    public static void countingSort(int[] input) {
+        if(!checkInput(input))
+            return;
+        int[] c = new int[10];
+        int[] b = new int[input.length];
+        for(int i = 0; i < input.length; i++)
+            c[input[i]]++;
+        for(int i = 1; i < c.length; i++)
+            c[i] += c[i - 1];
+        for(int i = input.length - 1; i >= 0; --i)
+            b[--c[input[i]]] = input[i];
+        for(int i = 0; i < input.length; i++)
+            input[i] = b[i];
+    }
+
+    /**
+     * 冒泡排序
+     * @param input
+     */
+    public static void bubbleSort(int[] input) {
+        if(!checkInput(input))
+            return;
+        int flag = input.length;
+        int k;
+        while(flag > 0) {
+            k = flag;
+            flag = 0;
+            for(int i = 1; i < k; i++) {
+                if(input[i - 1] > input[i]) {
+                    swap(input, i - 1, i);
+                    flag = i;
+                }
+            }
+        }
+    }
+
+    //外部排序，模拟
+    private static final int K = 4; //k路归并
+    private static final int MAX_VALUES = 100;
+    private static class DataInput {
+        private static final int[][] data = {
+                {5,16,49,52,78},
+                {7,12,25,84,91},
+                {29,38,57,66,71},
+                {9,22,47,48,59}
+        };
+        private int[] indexes = new int[4];
+
+        public int readOne(int index) {
+            if(indexes[index] < data[0].length )
+                return data[index][indexes[index]++];
+            return MAX_VALUES;
+        }
+    }
+    private static class DataOutput {
+        private final int[] outputs = new int[K * 5];
+        private int index;
+
+        public void writeOne(int d) {
+            if(index < outputs.length)
+                outputs[index++] = d;
+            else {
+                System.out.println(this);
+                throw new RuntimeException("Data writable area is full.");
+            }
+        }
+
+        @Override
+        public String toString() {
+            return "DataOutput{" +
+                    "outputs=" + Arrays.toString(outputs) +
+                    '}';
+        }
+    }
+    private static final DataInput dataInput = new DataInput();
+    private static final DataOutput dataOutput = new DataOutput();
+    private static final int[] b = new int[K+1]; //MIN_KEY is 0
+    private static final int MIN_KEY = 0;
+    public static void simulation() {
+        int[] ls = new int[K];
+
+        KMerge(ls);
+
+        System.out.println(dataOutput);
+    }
+
+    public static int readOne(int index, int[] b) {
+        return b[index] = dataInput.readOne(index);
+    }
+
+    public static void writeOne(int d) {
+        dataOutput.writeOne(d);
+    }
+
+    /**
+     * K路合并
+     *
+     * @param ls
+     */
+    public static void KMerge(int[] ls) {
+        //读入每个归并段第一个元素
+        for(int i = 0; i < K; i++)
+            readOne(i, b);
+
+        //构建败者树
+        createLoserTree(ls);
+
+        while(b[ls[0]] != MAX_VALUES) {
+            writeOne(b[ls[0]]);
+
+            if(readOne(ls[0], b) > 0) {
+                adjust(ls, ls[0]);
+            }
+        }
+
+    }
+
+
+    /**
+     * 填充败者树
+     *
+     * @param ls
+     */
+    public static void createLoserTree(int[] ls) {
+        b[K] = MIN_KEY;
+
+        for(int i = 0; i < K; i++) {
+            ls[i] = K;
+        }
+
+        for(int i = K - 1; i >= 0; --i) {
+            adjust(ls, i);
+        }
+    }
+
+    /**
+     * 调整败者树
+     *
+     * @param ls
+     * @param s
+     */
+    public static void adjust(int[] ls, int s) {
+        int t = (K + s) >> 1;
+
+        while(t > 0) {
+            if(b[s] > b[ls[t]]) {
+                int temp = s;
+                s = ls[t];
+                ls[t] = temp;
+            }
+            t >>= 1;
+        }
+
+        ls[0] = s;
+    }
+
+
     private static void test(Consumer<int[]> consumer, int[] case0) {
         System.out.println("original array: " + Arrays.toString(case0));
         consumer.accept(case0);
@@ -245,6 +418,19 @@ public class SortUtil {
         test(SortUtil::quickSort, case2);
         test(SortUtil::quickSort, Arrays.copyOf(case3, case3.length));
 
+        int[] case4 = {4,6,7,2,3,1,0,9,3};
+        System.out.println("计数排序");
+        test(SortUtil::countingSort, case1);
+        test(SortUtil::countingSort, case2);
+        test(SortUtil::countingSort, Arrays.copyOf(case4, case4.length));
+
+        System.out.println("冒泡排序");
+        test(SortUtil::bubbleSort, case1);
+        test(SortUtil::bubbleSort, case2);
+        test(SortUtil::bubbleSort, Arrays.copyOf(case3, case3.length));
+
+        simulation();
     }
 
 }
+
