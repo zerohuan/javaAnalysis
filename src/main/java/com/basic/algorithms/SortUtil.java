@@ -1,4 +1,4 @@
-package com.basic;
+package com.basic.algorithms;
 
 import java.util.Arrays;
 import java.util.function.Consumer;

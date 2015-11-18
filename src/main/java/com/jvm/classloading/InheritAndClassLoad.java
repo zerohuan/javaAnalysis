@@ -1,4 +1,4 @@
-package com.yjh.interfaceAndClass;
+package com.jvm.classloading;
 
 /**
  * 继承和类加载过程
@@ -7,25 +7,35 @@ package com.yjh.interfaceAndClass;
  */
 public class InheritAndClassLoad {
     static {
-        System.out.println("Wrapper is initialized!");
+        System.out.println("Wrapper start initializing");
     }
 
     private static class D {
+        static {
+            System.out.println("D is initializing!");
+        }
+
         static {
             System.out.println("D is initialized!");
         }
     }
 
     private static class A {
-        private static C ac = new C("a c");
-        private static D d = new D();
         static {
-            System.out.println("A is initialized!");
+            System.out.println("A start initializing!");
         }
+        //包含子类的static引用，并且在定义处进行实例化，子类的初始化会在父类初始化结束前进行，这可能造成错误
+//        private static C ac = new C("a c");
+        private static D d = new D();
+
         private static int sa = 9;
 
 
         int a = initInt("a instantiated.");
+
+        static {
+            System.out.println("A is initialized!");
+        }
 
         public A() {
             System.out.println("A constructor.");
@@ -37,6 +47,10 @@ public class InheritAndClassLoad {
     }
 
     private static class B extends A {
+        static {
+            System.out.println("B start initializing!");
+        }
+
         int b = initInt("b instantiated.");
 
         public B() {
@@ -49,7 +63,7 @@ public class InheritAndClassLoad {
 
         public static void main(String[] args) {
             try {
-                Class.forName("com.yjh.interfaceAndClass.InheritAndClassLoad$C");
+                Class.forName("com.jvm.classloading.InheritAndClassLoad$C");
             } catch (Exception e) {
                 e.printStackTrace();;
             }
@@ -57,6 +71,9 @@ public class InheritAndClassLoad {
     }
 
     private static class C extends B {
+        static {
+            System.out.println("C start initializing!");
+        }
         private static int sc = 9 + A.sa;
         int c = initInt("c instantiated.");
 

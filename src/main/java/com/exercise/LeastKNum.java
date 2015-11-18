@@ -1,6 +1,6 @@
 package com.exercise;
 
-import com.basic.SortUtil;
+import com.basic.algorithms.SortUtil;
 
 import java.util.*;
 
