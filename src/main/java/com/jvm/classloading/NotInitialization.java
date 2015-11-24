@@ -45,8 +45,15 @@ public class NotInitialization {
         }
     };
 
+    private static MTestable subInstantiation = new AbstractTestable("查看数组类的加载") {
+        @Override
+        public void test() throws Exception {
+            SubClass subClass = new SubClass();
+        }
+    };
+
     public static void main(String[] args) {
 //        MTester.test(sub1);
-        MTester.test(arrayRef);
+        MTester.test(subInstantiation);
     }
 }

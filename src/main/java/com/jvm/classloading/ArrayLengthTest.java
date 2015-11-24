@@ -38,7 +38,7 @@ public class ArrayLengthTest {
 //        0: bipush        10
 //        2: newarray       int
 //        4: astore_1
-//        5: aload_1
+//        5: aload_1s
 //        6: arraylength
 //        7: istore_2
 //        8: aload_1

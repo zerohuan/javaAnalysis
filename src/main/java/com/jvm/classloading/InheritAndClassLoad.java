@@ -25,11 +25,12 @@ public class InheritAndClassLoad {
             System.out.println("A start initializing!");
         }
         //包含子类的static引用，并且在定义处进行实例化，子类的初始化会在父类初始化结束前进行，这可能造成错误
-//        private static C ac = new C("a c");
+        private static C ac = new C("a c");
         private static D d = new D();
 
         private static int sa = 9;
 
+        private static final int sb = initInt("A static final field");
 
         int a = initInt("a instantiated.");
 
@@ -65,7 +66,7 @@ public class InheritAndClassLoad {
             try {
                 Class.forName("com.jvm.classloading.InheritAndClassLoad$C");
             } catch (Exception e) {
-                e.printStackTrace();;
+                e.printStackTrace();
             }
         }
     }
@@ -78,7 +79,7 @@ public class InheritAndClassLoad {
         int c = initInt("c instantiated.");
 
         public C(String id) {
-            System.out.println("C constructor. " + id);
+            System.out.println("C constructor. " + id + " " + sc);
         }
 
         static {
@@ -96,5 +97,6 @@ public class InheritAndClassLoad {
     }
 
     public static void main(String[] args) {
+        int a = A.sb;
     }
 }
