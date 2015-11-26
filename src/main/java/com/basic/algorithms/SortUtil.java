@@ -256,6 +256,17 @@ public class SortUtil {
         }
     }
 
+    public static void bubbleSortBasic(int[] input) {
+        if(!checkInput(input))
+            return;
+        for(int i = 0; i < input.length; i++) {
+            for(int j = 0; j < input.length - i - 1; j++) {
+                if(input[j + 1] < input[j])
+                    swap(input, j + 1, j);
+            }
+        }
+    }
+
     //外部排序，模拟
     private static final int K = 4; //k路归并
     private static final int MAX_VALUES = 100;
@@ -429,7 +440,12 @@ public class SortUtil {
         test(SortUtil::bubbleSort, case2);
         test(SortUtil::bubbleSort, Arrays.copyOf(case3, case3.length));
 
-        simulation();
+        System.out.println("冒泡排序（基础版）");
+        test(SortUtil::bubbleSortBasic, case1);
+        test(SortUtil::bubbleSortBasic, case2);
+        test(SortUtil::bubbleSortBasic, Arrays.copyOf(case3, case3.length));
+
+//        simulation();
     }
 
 }

@@ -4,15 +4,24 @@ package com.jvm.classloading;
  * Created by yjh on 15-11-24.
  */
 public class WrongInstantiation {
-    private static class A {
+    private abstract static class A {
         private int aInt = 9;
 
         public A() {
             doSomething();
+//            try {
+//                doPrivate();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
         }
 
         protected void doSomething() {
             System.out.println("A's doSomething");
+        }
+
+        private void doPrivate() throws Exception {
+            System.out.println("A's doPrivate");
         }
     }
 
