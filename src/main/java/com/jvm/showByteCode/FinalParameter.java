@@ -10,6 +10,7 @@ public final class FinalParameter {
     interface A {
         void test();
     }
+
     private void testFinal(byte[] bytes) {
         int a = 10;
         new A() {

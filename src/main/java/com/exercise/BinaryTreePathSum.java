@@ -1,6 +1,7 @@
 package com.exercise;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 /**
  * 输入一颗二叉树和一个整数，打印出二叉树中结点值的和为输入整数的所有路径。
@@ -45,6 +46,38 @@ public class BinaryTreePathSum {
         }
     }
 
+    public ArrayList<ArrayList<Integer>> PathFind(TreeNode root,int target) {
+        Stack<Integer> path = new Stack<>();
+        ArrayList<ArrayList<Integer>> prints = new ArrayList<>();
+        if(root != null)
+            PathFind(root, path, prints, 0, target);
+        return prints;
+    }
+
+    public void PathFind(TreeNode root, Stack<Integer> path,
+                                                  ArrayList<ArrayList<Integer>> prints, int currentSum, int target) {
+        currentSum += root.val;
+        path.push(root.val);
+        //是否为叶节点，并且
+        if(root.left == null && root.right == null && currentSum == target) {
+            ArrayList<Integer> list = new ArrayList<>();
+            for(int i : path) {
+                list.add(i);
+            }
+            prints.add(list);
+        }
+        //不是叶节点
+        //有左子树
+        if(root.left != null) {
+            PathFind(root.left, path, prints, currentSum, target);
+        }
+        //有右子树
+        if(root.right != null) {
+            PathFind(root.right, path, prints, currentSum, target);
+        }
+        path.pop();
+    }
+
     static class TreeNode {
         int val = 0;
         TreeNode left = null;
@@ -52,7 +85,6 @@ public class BinaryTreePathSum {
 
         public TreeNode(int val) {
             this.val = val;
-
         }
 
     }
