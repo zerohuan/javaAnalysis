@@ -1,5 +1,7 @@
 package com.yjh.util;
 
+import java.lang.reflect.Field;
+
 /**
  * print tools
  *
@@ -16,5 +18,17 @@ public class PrintUtil {
             stringBuilder.append(String.format("%02x", b)).append(" ");
         }
         return stringBuilder.toString();
+    }
+
+    public static void printAllClassName(Class<?>...clazs) {
+        for(Class<?> c : clazs) {
+            System.out.println(c.getName() + " " + c.getCanonicalName());
+        }
+    }
+
+    public static void printAllMethod(Field...fields) {
+        for(Field f : fields) {
+            System.out.println(f.getName());
+        }
     }
 }

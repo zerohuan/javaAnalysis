@@ -11,8 +11,8 @@ public final class FinalParameter {
         void test();
     }
 
-    private void testFinal(byte[] bytes) {
-        int a = 10;
+    private void testFinal(final byte[] bytes) {
+        final int a = 10;
         new A() {
             @Override
             public void test() {

@@ -11,7 +11,7 @@ public class WrongInstantiation {
             doSomething();
 //            try {
 //                doPrivate();
-//            } catch (Exception e) {
+//            } catch (ExceptionShow e) {
 //                e.printStackTrace();
 //            }
         }

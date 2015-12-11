@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.function.Consumer;
 
 /**
  * Test allocateDirect and map()
@@ -57,19 +56,19 @@ public class DirectMemoryTest {
         }
     }
 
-    public static void test(Consumer<String> consumer) {
-        long startTime = System.currentTimeMillis();
-
-        consumer.accept(TEST_FILE);
-
-        long endTime = System.currentTimeMillis();
-
-        System.out.println("Time consume: " + (endTime - startTime));
-    }
+//    public static void test(Consumer<String> consumer) {
+//        long startTime = System.currentTimeMillis();
+//
+//        consumer.accept(TEST_FILE);
+//
+//        long endTime = System.currentTimeMillis();
+//
+//        System.out.println("Time consume: " + (endTime - startTime));
+//    }
 
     public static void main(String[] args) {
-        test(DirectMemoryTest::testNormal);
-        test(DirectMemoryTest::testDirect);
-        test(DirectMemoryTest::testMapped);
+//        test(DirectMemoryTest::testNormal);
+//        test(DirectMemoryTest::testDirect);
+//        test(DirectMemoryTest::testMapped);
     }
 }

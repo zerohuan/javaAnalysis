@@ -55,12 +55,15 @@ public class AtomicTest {
         }
         service.shutdown();
 
-        new Thread(() -> {
-            try {
-                downLatch.await();
-                System.out.println(combineVariable);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    downLatch.await();
+                    System.out.println(combineVariable);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }).start();
 

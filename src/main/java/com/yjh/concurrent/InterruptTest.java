@@ -14,18 +14,21 @@ public class InterruptTest {
     }
 
     public static void main(String[] args) {
-        Thread thread = new Thread(() ->{
-            try {
-                double d = 0.0;
-                for(int i = 0; i < Integer.MAX_VALUE; i++) {
-                    d += 100 * Math.sqrt(i);
-                    if(Thread.interrupted()) {
-                        System.out.println("Thread is interrupted! d:" + d);
-                        break;
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    double d = 0.0;
+                    for(int i = 0; i < Integer.MAX_VALUE; i++) {
+                        d += 100 * Math.sqrt(i);
+                        if(Thread.interrupted()) {
+                            System.out.println("Thread is interrupted! d:" + d);
+                            break;
+                        }
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         });
         thread.start();

@@ -33,7 +33,7 @@ public class ArrayLengthTest {
 //        1: invokespecial #1                  // Method java/lang/Object."<init>":()V
 //        4: return
 //
-//        public static void main(java.lang.String[]) throws java.lang.Exception;
+//        public static void main(java.lang.String[]) throws java.lang.ExceptionShow;
 //        Code:
 //        0: bipush        10
 //        2: newarray       int

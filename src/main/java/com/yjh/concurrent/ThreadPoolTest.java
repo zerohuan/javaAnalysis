@@ -34,7 +34,7 @@ public class ThreadPoolTest {
         private static final AtomicLong atomicLong = new AtomicLong();
 
         public MonitorThreadPool(int corePoolSize) {
-            super(corePoolSize, corePoolSize, 60l, TimeUnit.SECONDS, new LinkedBlockingDeque<>());
+            super(corePoolSize, corePoolSize, 60l, TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>());
         }
 
         @Override

@@ -1,7 +1,6 @@
 package com.basic.algorithms;
 
 import java.util.Arrays;
-import java.util.function.Consumer;
 
 /**
  *
@@ -388,62 +387,62 @@ public class SortUtil {
     }
 
 
-    private static void test(Consumer<int[]> consumer, int[] case0) {
-        System.out.println("original array: " + Arrays.toString(case0));
-        consumer.accept(case0);
-        System.out.println("sorted array: " + Arrays.toString(case0));
-    }
+//    private static void test(Consumer<int[]> consumer, int[] case0) {
+//        System.out.println("original array: " + Arrays.toString(case0));
+//        consumer.accept(case0);
+//        System.out.println("sorted array: " + Arrays.toString(case0));
+//    }
 
     public static void main(String[] args) {
         int[] case1 = null;
         int[] case2 = {};
         int[] case3 = {34,8,64,51,32,21};
 
-        System.out.println("插入排序");
-        test(SortUtil::insertionSort, case1);
-        test(SortUtil::insertionSort, case2);
-        test(SortUtil::insertionSort, Arrays.copyOf(case3, case3.length));
-
-        System.out.println("希尔排序");
-        test(SortUtil::shellSort, case1);
-        test(SortUtil::shellSort, case2);
-        test(SortUtil::shellSort, Arrays.copyOf(case3, case3.length));
-
-        System.out.println("堆排序");
-        test(SortUtil::heapSort, case1);
-        test(SortUtil::heapSort, case2);
-        test(SortUtil::heapSort, Arrays.copyOf(case3, case3.length));
-
-        System.out.println("选择排序");
-        test(SortUtil::selectSort, case1);
-        test(SortUtil::selectSort, case2);
-        test(SortUtil::selectSort, Arrays.copyOf(case3, case3.length));
-
-        System.out.println("归并排序");
-        test(SortUtil::mergeSort, case1);
-        test(SortUtil::mergeSort, case2);
-        test(SortUtil::mergeSort, Arrays.copyOf(case3, case3.length));
-
-        System.out.println("快速排序");
-        test(SortUtil::quickSort, case1);
-        test(SortUtil::quickSort, case2);
-        test(SortUtil::quickSort, Arrays.copyOf(case3, case3.length));
-
-        int[] case4 = {4,6,7,2,3,1,0,9,3};
-        System.out.println("计数排序");
-        test(SortUtil::countingSort, case1);
-        test(SortUtil::countingSort, case2);
-        test(SortUtil::countingSort, Arrays.copyOf(case4, case4.length));
-
-        System.out.println("冒泡排序");
-        test(SortUtil::bubbleSort, case1);
-        test(SortUtil::bubbleSort, case2);
-        test(SortUtil::bubbleSort, Arrays.copyOf(case3, case3.length));
-
-        System.out.println("冒泡排序（基础版）");
-        test(SortUtil::bubbleSortBasic, case1);
-        test(SortUtil::bubbleSortBasic, case2);
-        test(SortUtil::bubbleSortBasic, Arrays.copyOf(case3, case3.length));
+//        System.out.println("插入排序");
+//        test(SortUtil::insertionSort, case1);
+//        test(SortUtil::insertionSort, case2);
+//        test(SortUtil::insertionSort, Arrays.copyOf(case3, case3.length));
+//
+//        System.out.println("希尔排序");
+//        test(SortUtil::shellSort, case1);
+//        test(SortUtil::shellSort, case2);
+//        test(SortUtil::shellSort, Arrays.copyOf(case3, case3.length));
+//
+//        System.out.println("堆排序");
+//        test(SortUtil::heapSort, case1);
+//        test(SortUtil::heapSort, case2);
+//        test(SortUtil::heapSort, Arrays.copyOf(case3, case3.length));
+//
+//        System.out.println("选择排序");
+//        test(SortUtil::selectSort, case1);
+//        test(SortUtil::selectSort, case2);
+//        test(SortUtil::selectSort, Arrays.copyOf(case3, case3.length));
+//
+//        System.out.println("归并排序");
+//        test(SortUtil::mergeSort, case1);
+//        test(SortUtil::mergeSort, case2);
+//        test(SortUtil::mergeSort, Arrays.copyOf(case3, case3.length));
+//
+//        System.out.println("快速排序");
+//        test(SortUtil::quickSort, case1);
+//        test(SortUtil::quickSort, case2);
+//        test(SortUtil::quickSort, Arrays.copyOf(case3, case3.length));
+//
+//        int[] case4 = {4,6,7,2,3,1,0,9,3};
+//        System.out.println("计数排序");
+//        test(SortUtil::countingSort, case1);
+//        test(SortUtil::countingSort, case2);
+//        test(SortUtil::countingSort, Arrays.copyOf(case4, case4.length));
+//
+//        System.out.println("冒泡排序");
+//        test(SortUtil::bubbleSort, case1);
+//        test(SortUtil::bubbleSort, case2);
+//        test(SortUtil::bubbleSort, Arrays.copyOf(case3, case3.length));
+//
+//        System.out.println("冒泡排序（基础版）");
+//        test(SortUtil::bubbleSortBasic, case1);
+//        test(SortUtil::bubbleSortBasic, case2);
+//        test(SortUtil::bubbleSortBasic, Arrays.copyOf(case3, case3.length));
 
 //        simulation();
     }
