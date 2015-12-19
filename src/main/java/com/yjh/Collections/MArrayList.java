@@ -14,7 +14,7 @@ import java.util.function.Consumer;
  *
  * Created by yjh on 15-12-11.
  */
-public class ArrayList<E> extends AbstractList<E>
+public class MArrayList<E> extends AbstractList<E>
         implements List<E>, RandomAccess, Cloneable, Serializable {
 
 
@@ -58,7 +58,7 @@ public class ArrayList<E> extends AbstractList<E>
     不同版本的构造器
      */
     //如果指定初始化容量为“0”，使用EMPTY_ELEMENTDATA
-    public ArrayList(int initialCapacity) {
+    public MArrayList(int initialCapacity) {
         if (initialCapacity > 0) {
             this.elementData = new Object[initialCapacity];
         } else if (initialCapacity == 0) {
@@ -69,12 +69,12 @@ public class ArrayList<E> extends AbstractList<E>
         }
     }
     //创建默认初始化容量列表，使用DEFAULTCAPACITY_EMPTY_ELEMENTDATA
-    public ArrayList() {
+    public MArrayList() {
         this.elementData = DEFAULTCAPACITY_EMPTY_ELEMENTDATA;
     }
 
     //拷贝构造器，注意使用toArray获取要插入元素对象
-    public ArrayList(Collection<? extends E> c) {
+    public MArrayList(Collection<? extends E> c) {
         elementData = c.toArray();
         if((size = elementData.length) != 0) {
             /*
@@ -520,7 +520,7 @@ public class ArrayList<E> extends AbstractList<E>
     @Override
     public Object clone() {
         try {
-            ArrayList<?> v = (ArrayList<?>) super.clone();
+            MArrayList<?> v = (MArrayList<?>) super.clone();
             v.elementData = Arrays.copyOf(elementData, size);
             v.modCount = 0;
             return v;
@@ -552,7 +552,7 @@ public class ArrayList<E> extends AbstractList<E>
             int i = cursor;
             if (i >= size)
                 throw new NoSuchElementException();
-            Object[] elementData = ArrayList.this.elementData;
+            Object[] elementData = MArrayList.this.elementData;
             if (i >= elementData.length)
                 throw new ConcurrentModificationException();
             cursor = i + 1;
@@ -567,7 +567,7 @@ public class ArrayList<E> extends AbstractList<E>
 
             try {
                 //删除了最后返回位置上的元素，之后的的数组元素“前移”了一位，因此cursor = lastRet
-                ArrayList.this.remove(lastRet);
+                MArrayList.this.remove(lastRet);
                 cursor = lastRet;
                 //这时最后返回的元素已被删除，应该置为-1
                 lastRet = -1;
@@ -610,7 +610,7 @@ public class ArrayList<E> extends AbstractList<E>
             int i = cursor - 1;
             if (i < 0)
                 throw new NoSuchElementException();
-            Object[] elementData = ArrayList.this.elementData;
+            Object[] elementData = MArrayList.this.elementData;
             if (i >= elementData.length)
                 throw new ConcurrentModificationException();
             cursor = i;
@@ -623,7 +623,7 @@ public class ArrayList<E> extends AbstractList<E>
             checkForComodification();
 
             try {
-                ArrayList.this.set(lastRet, e);
+                MArrayList.this.set(lastRet, e);
             } catch (IndexOutOfBoundsException ex) {
                 throw new ConcurrentModificationException();
             }
@@ -634,7 +634,7 @@ public class ArrayList<E> extends AbstractList<E>
 
             try {
                 int i = cursor;
-                ArrayList.this.add(i, e);
+                MArrayList.this.add(i, e);
                 cursor = i + 1;
                 lastRet = -1;
                 expectedModCount = modCount;
@@ -666,21 +666,21 @@ public class ArrayList<E> extends AbstractList<E>
             this.parentOffset = fromIndex;
             this.offset = offset + fromIndex;
             this.size = toIndex - fromIndex;
-            this.modCount = ArrayList.this.modCount;
+            this.modCount = MArrayList.this.modCount;
         }
 
         public E set(int index, E e) {
             rangeCheck(index);
             checkForComodification();
-            E oldValue = ArrayList.this.elementData(offset + index);
-            ArrayList.this.elementData[offset + index] = e;
+            E oldValue = MArrayList.this.elementData(offset + index);
+            MArrayList.this.elementData[offset + index] = e;
             return oldValue;
         }
 
         public E get(int index) {
             rangeCheck(index);
             checkForComodification();
-            return ArrayList.this.elementData(offset + index);
+            return MArrayList.this.elementData(offset + index);
         }
 
         public int size() {
@@ -692,7 +692,7 @@ public class ArrayList<E> extends AbstractList<E>
             rangeCheckForAdd(index);
             checkForComodification();
             parent.add(parentOffset + index, e);
-            this.modCount = ArrayList.this.modCount;
+            this.modCount = MArrayList.this.modCount;
             this.size++;
         }
 
@@ -700,16 +700,16 @@ public class ArrayList<E> extends AbstractList<E>
             rangeCheck(index);
             checkForComodification();
             E result = parent.remove(parentOffset + index);
-            this.modCount = ArrayList.this.modCount;
+            this.modCount = MArrayList.this.modCount;
             this.size--;
             return result;
         }
 
         protected void removeRange(int fromIndex, int toIndex) {
             checkForComodification();
-            ArrayList.this.removeRange(parentOffset + fromIndex,
+            MArrayList.this.removeRange(parentOffset + fromIndex,
                     parentOffset + toIndex);
-            this.modCount = ArrayList.this.modCount;
+            this.modCount = MArrayList.this.modCount;
             this.size -= toIndex - fromIndex;
         }
 
@@ -725,7 +725,7 @@ public class ArrayList<E> extends AbstractList<E>
 
             checkForComodification();
             parent.addAll(parentOffset + index, c);
-            this.modCount = ArrayList.this.modCount;
+            this.modCount = MArrayList.this.modCount;
             this.size += cSize;
             return true;
         }
@@ -742,7 +742,7 @@ public class ArrayList<E> extends AbstractList<E>
             return new ListIterator<E>() {
                 int cursor = index;
                 int lastRet = -1;
-                int expectedModCount = ArrayList.this.modCount;
+                int expectedModCount = MArrayList.this.modCount;
 
                 public boolean hasNext() {
                     return cursor != SubList.this.size;
@@ -754,7 +754,7 @@ public class ArrayList<E> extends AbstractList<E>
                     int i = cursor;
                     if (i >= SubList.this.size)
                         throw new NoSuchElementException();
-                    Object[] elementData = ArrayList.this.elementData;
+                    Object[] elementData = MArrayList.this.elementData;
                     if (offset + i >= elementData.length)
                         throw new ConcurrentModificationException();
                     cursor = i + 1;
@@ -771,7 +771,7 @@ public class ArrayList<E> extends AbstractList<E>
                     int i = cursor - 1;
                     if (i < 0)
                         throw new NoSuchElementException();
-                    Object[] elementData = ArrayList.this.elementData;
+                    Object[] elementData = MArrayList.this.elementData;
                     if (offset + i >= elementData.length)
                         throw new ConcurrentModificationException();
                     cursor = i;
@@ -786,7 +786,7 @@ public class ArrayList<E> extends AbstractList<E>
                     if (i >= size) {
                         return;
                     }
-                    final Object[] elementData = ArrayList.this.elementData;
+                    final Object[] elementData = MArrayList.this.elementData;
                     if (offset + i >= elementData.length) {
                         throw new ConcurrentModificationException();
                     }
@@ -815,7 +815,7 @@ public class ArrayList<E> extends AbstractList<E>
                         SubList.this.remove(lastRet);
                         cursor = lastRet;
                         lastRet = -1;
-                        expectedModCount = ArrayList.this.modCount;
+                        expectedModCount = MArrayList.this.modCount;
                     } catch (IndexOutOfBoundsException ex) {
                         throw new ConcurrentModificationException();
                     }
@@ -827,7 +827,7 @@ public class ArrayList<E> extends AbstractList<E>
                     checkForComodification();
 
                     try {
-                        ArrayList.this.set(offset + lastRet, e);
+                        MArrayList.this.set(offset + lastRet, e);
                     } catch (IndexOutOfBoundsException ex) {
                         throw new ConcurrentModificationException();
                     }
@@ -841,14 +841,14 @@ public class ArrayList<E> extends AbstractList<E>
                         SubList.this.add(i, e);
                         cursor = i + 1;
                         lastRet = -1;
-                        expectedModCount = ArrayList.this.modCount;
+                        expectedModCount = MArrayList.this.modCount;
                     } catch (IndexOutOfBoundsException ex) {
                         throw new ConcurrentModificationException();
                     }
                 }
 
                 final void checkForComodification() {
-                    if (expectedModCount != ArrayList.this.modCount)
+                    if (expectedModCount != MArrayList.this.modCount)
                         throw new ConcurrentModificationException();
                 }
             };
@@ -874,13 +874,13 @@ public class ArrayList<E> extends AbstractList<E>
         }
 
         private void checkForComodification() {
-            if (ArrayList.this.modCount != this.modCount)
+            if (MArrayList.this.modCount != this.modCount)
                 throw new ConcurrentModificationException();
         }
 
 //        public Spliterator<E> spliterator() {
 //            checkForComodification();
-//            return new ArrayListSpliterator<E>(ArrayList.this, offset,
+//            return new ArrayListSpliterator<E>(MArrayList.this, offset,
 //                    offset + this.size, this.modCount);
 //        }
     }

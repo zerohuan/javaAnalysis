@@ -1,4 +1,4 @@
-package com.basic.dataStructure;
+package com.basic.collection;
 
 import java.util.Stack;
 
