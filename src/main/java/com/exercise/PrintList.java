@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * 输入一个链表，从尾到头打印链表每个节点的值。
  *
  * 思路：
- * 递归，太简单。
+ * 递归/栈+迭代，太简单。
  *
  * Created by yjh on 15-10-25.
  */

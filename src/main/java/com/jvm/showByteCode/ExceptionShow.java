@@ -10,6 +10,31 @@ import java.util.zip.ZipException;
  * Created by yjh on 15-12-4.
  */
 public class ExceptionShow {
+    private int ifAndFinally(int x) {
+        if (x == 1) {
+            try {
+                x = 2;
+            } finally {
+                x = 3;
+            }
+        } else {
+            try {
+                x = 4;
+            } finally {
+                x = 5;
+            }
+        }
+        return x;
+    }
+
+    private int exceptionInFinally() {
+        try {
+            System.out.println("try normal");
+        } finally {
+            throw new NullPointerException();
+        }
+    }
+
     private int hasException() {
         int x;
         try {
@@ -118,6 +143,7 @@ public class ExceptionShow {
             throw new IllegalArgumentException();
         } finally {
             int x = 3;
+            System.out.println(x);
         }
     }
 
@@ -184,5 +210,12 @@ public class ExceptionShow {
         }
 
         exceptionShow.printStaceTrace();
+
+        try {
+            exceptionShow.lostException3();
+            exceptionShow.exceptionInFinally();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
 }
