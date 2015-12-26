@@ -85,7 +85,7 @@ public class BioServer extends AbstractServer {
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e);
             }
             logger.info(Thread.currentThread().getName() + "'s connection is closed");
         }
