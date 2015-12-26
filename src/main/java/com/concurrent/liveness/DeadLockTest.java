@@ -1,5 +1,7 @@
 package com.concurrent.liveness;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created by yjh on 15-12-23.
  */
@@ -10,20 +12,46 @@ public class DeadLockTest {
      */
     private final Object left = new Object();
     private final Object right = new Object();
-    private void leftRight() {
+    private void leftRight() throws InterruptedException {
         synchronized (left) {
+            TimeUnit.MILLISECONDS.sleep(100);
             synchronized (right) {
                 System.out.println("left-right");
             }
         }
     }
 
-    private void rightLeft() {
+    private void rightLeft() throws InterruptedException  {
         synchronized (right) {
+            TimeUnit.MILLISECONDS.sleep(100);
             synchronized (left) {
                 System.out.println("right-left");
             }
         }
+    }
+
+    private static void rlDeadLock() {
+        DeadLockTest t = new DeadLockTest();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    t.leftRight();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    t.rightLeft();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     /*
@@ -90,8 +118,7 @@ public class DeadLockTest {
     }
 
 
-
     public static void main(String[] args) {
-
+        rlDeadLock();
     }
 }
