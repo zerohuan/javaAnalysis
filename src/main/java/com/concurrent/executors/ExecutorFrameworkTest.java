@@ -5,10 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  *
@@ -109,32 +106,35 @@ public class ExecutorFrameworkTest {
     当队列满的时候，数组扩容为原来的2倍；
     现在应当尽量避免使用Timer
      */
+    private static final TimerTask t100 = new TimerTask() {
+        @Override
+        public void run() {
+            try {
+                TimeUnit.SECONDS.sleep(1);
+                System.out.println("Timer 100");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    };
+    private static final TimerTask t400 = new TimerTask() {
+        @Override
+        public void run() {
+            try {
+                TimeUnit.SECONDS.sleep(4);
+                System.out.println("Timer 400");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    };
     private static void timerTest() {
         Timer timer = new Timer();
-        TimerTask t100 = new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    TimeUnit.SECONDS.sleep(1);
-                    System.out.println("Timer 100");
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        TimerTask t400 = new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    TimeUnit.SECONDS.sleep(4);
-                    System.out.println("Timer 400");
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
+
         timer.schedule(t100, 0, 1000);
         timer.schedule(t400, 0, 1000);
+        timer.scheduleAtFixedRate(t100, 0, 1000);
+        timer.scheduleAtFixedRate(t400, 0, 1000);
         t100.cancel();
         t400.cancel();
         //未检查的异常将导致工作线程停止，直接over
@@ -150,7 +150,91 @@ public class ExecutorFrameworkTest {
                 System.out.println("t!");
             }
         }, 0, 1000);
+
     }
+    /*
+    scheduledThreadPool，同样也是基于堆的优先队列实现;
+    ScheduledThreadPoolExecutor将任务包装成Comparable的延时/周期任务
+    (RunnableScheduledFuture装饰器模式)实现了Delay，根据下一次执行的时间进行比较
+     */
+    private static void testScheduledThreadPool() {
+        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(10);
+//        executorService.scheduleAtFixedRate(t100, 0, 1, TimeUnit.SECONDS);
+//        executorService.scheduleAtFixedRate(t400, 0, 4, TimeUnit.SECONDS);
+        executorService.schedule(t100, 1, TimeUnit.SECONDS);
+    }
+
+
+    /*
+    Executor基本用法
+     */
+    //Future 可以cancel，get：
+    private static Callable<String> timeTask = new Callable<String>() {
+        @Override
+        public String call() throws Exception {
+            TimeUnit.SECONDS.sleep(2);
+            return "success";
+        }
+    };
+    private static void testFutureResult() {
+        ExecutorService service = Executors.newFixedThreadPool(10);
+        Future<String> f = service.submit(timeTask);
+        try {
+            //当前线程状态变化：RUNNABLE—>TIMED_WAITING->RUNNABLE
+            f.cancel(true);
+            f.get(1, TimeUnit.SECONDS);
+        } catch (CancellationException e) {
+            System.out.println("CancellationException");
+        } catch (ExecutionException e) {
+            /*
+            可以通过ExecutionException.getCause获取任务中发生的异常
+             */
+            System.out.println("ExecutionException");
+        } catch (TimeoutException e) {
+            /*
+            设置了超时时间
+             */
+            System.out.println("TimeoutException");
+        } catch (InterruptedException e) {
+            /*
+            被中断
+             */
+            System.out.println("InterruptedException");
+        }
+        service.shutdown(); //拒绝新的任务
+//        service.shutdownNow(); //停止正在执行的任务进程（线程），本质上是通过中断
+    }
+
+    /*
+    CompletionService：Future
+    基于组合，提供一个阻塞队列来解耦客户端（消费者）和生产者
+    每个执行任务完成后向阻塞队列中添加结果；
+    默认使用LinkedBlocked，可以重新设置；
+    poll有非阻塞和计时等待两个版本
+    take是阻塞获取
+     */
+    private static final class CompletionTask implements Callable<String> {
+        @Override
+        public String call() throws Exception {
+            TimeUnit.SECONDS.sleep(1);
+            return "Success";
+        }
+    }
+    private static void completionServiceTest() throws Exception {
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        CompletionService<String> service = new ExecutorCompletionService<String>(executorService);
+        int num = 10;
+        for (int i = 0; i < num; ++i) {
+            service.submit(new CompletionTask());
+        }
+        System.out.println(service.poll() == null);
+        //先执行完的任务，先输出结果
+        for (int i = 0; i < num; ++i) {
+            System.out.println(service.take().get());
+        }
+        executorService.shutdown();
+    }
+
 
     private static void printStatus(Object o) {
         if (o instanceof Thread) {
@@ -163,9 +247,14 @@ public class ExecutorFrameworkTest {
         }
     }
 
-    public static void main(String[] args) throws InterruptedException  {
-//        executorStatus();
-        timerTest();
+    
 
+    public static void main(String[] args) throws Exception  {
+//        executorStatus();
+//        timerTest();
+//        testScheduledThreadPool();
+//        testFutureResult();
+        completionServiceTest();
     }
+
 }
