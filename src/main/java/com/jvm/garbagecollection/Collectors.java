@@ -106,7 +106,7 @@ public class Collectors {
     CMS默认与ParNew搭配，也可以与Serial Old搭配
 
     CMS重要参数：
-    -XX+UseCMSCompactAtFullCollection：在要FullGC前进行一个压缩
+    -XX:+UseCMSCompactAtFullCollection：在要FullGC前进行一个压缩
     -XX:CMSFullGCsBeforeCompaction：多少次不带压缩的FullGC之后来一次带压缩的FullGC
     -XX:CMSInitiatingOccupancyFraction=92：old区达到92%占用是触发CMS进行回收
     -XX:+CMSParallelRemarkEnabled：并行的remark

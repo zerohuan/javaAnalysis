@@ -108,7 +108,7 @@ public class FutureCancel {
              */
             throw launderThrowable(e.getCause());
         } finally {
-            f.cancel(true);
+            System.out.println(f.cancel(true));
         }
     }
 
@@ -123,8 +123,10 @@ public class FutureCancel {
     }
 
 
+
+
     public static void main(String[] args) throws InterruptedException{
-        timedRun2(new Runnable() {
+        timedRun3(new Runnable() {
             @Override
             public void run() {
                 try {
