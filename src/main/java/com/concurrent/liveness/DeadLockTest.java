@@ -1,6 +1,9 @@
 package com.concurrent.liveness;
 
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by yjh on 15-12-23.
@@ -59,6 +62,7 @@ public class DeadLockTest {
     依赖与运行时变量引用的对象顺序
      */
     private static final class Account {
+        final Lock lock = new ReentrantLock();
         double balance;
         void dedit(double amount) {}
         void credit(double amount) {}
@@ -115,6 +119,46 @@ public class DeadLockTest {
                 }
             }
         }
+    }
+
+    //使用显式锁实现轮询锁避免死锁问题
+    private static final Random rnd = new Random(47); //Random是线程安全的类
+    public boolean transfer(Account fromAct, Account toAct,
+                            double amount, long timeout, TimeUnit unit) throws InterruptedException {
+        //产生随机的等待时间重试时间，防止活锁问题
+        long fixedDelay = getFixedDelayComponentNanos(timeout, unit);
+        long rndDelayMod = getRandomDelayModulesNanos(timeout, unit);
+        long stopTime = System.nanoTime() + unit.toNanos(timeout);
+        while (true) {
+            if (fromAct.lock.tryLock()) {
+                try {
+                    if (toAct.lock.tryLock()) {
+                        try {
+                            //成功获取了两个锁
+                            if (fromAct.balance < amount)
+                                throw new IllegalStateException();
+                            fromAct.dedit(amount);
+                            toAct.credit(amount);
+                            return true;
+                        } finally {
+                            toAct.lock.unlock();
+                        }
+                    }
+                } finally {
+                    fromAct.lock.unlock();
+                }
+            }
+            if (System.nanoTime() > stopTime)
+                return false;
+            //每次都加入一定的随机性
+            TimeUnit.NANOSECONDS.sleep(fixedDelay + rnd.nextLong() % rndDelayMod);
+        }
+    }
+    private static long getFixedDelayComponentNanos(long timeout, TimeUnit unit) {
+        return unit.toNanos(timeout / 100);
+    }
+    private static long getRandomDelayModulesNanos(long timeout, TimeUnit unit) {
+        return unit.toNanos(Math.max(timeout / 1000, Math.min(1000, timeout)));
     }
 
 

@@ -205,6 +205,36 @@ public class ExecutorFrameworkTest {
 //        service.shutdownNow(); //停止正在执行的任务进程（线程），本质上是通过中断
     }
 
+    private static final class CancelFalseTest {
+        private static final ExecutorService executors = Executors.newFixedThreadPool(2);
+
+        public static void main(String[] args) throws InterruptedException {
+            class SleepTask implements Callable {
+                @Override
+                public Object call() throws Exception {
+                    try {
+                        TimeUnit.SECONDS.sleep(2);
+                        System.out.println("wake up");
+                    } catch (InterruptedException e) {
+                        System.out.println("interrupted");
+                    }
+                    return null;
+                }
+            }
+            Future<?> f = executors.submit(new SleepTask());
+            TimeUnit.SECONDS.sleep(1);
+            f.cancel(false);
+//            try {
+//                f.get();
+//            } catch (ExecutionException e) {
+//                System.out.println(e.getCause());
+//            } catch (Exception e) {
+//                System.out.println(e);
+//            }
+            executors.shutdown();
+        }
+    }
+
     /*
     CompletionService：Future
     基于组合，提供一个阻塞队列来解耦客户端（消费者）和生产者
@@ -246,15 +276,53 @@ public class ExecutorFrameworkTest {
             System.out.println("Executor " + e.isShutdown() + " " + e.isTerminated());
         }
     }
+    static class SleepTask implements Runnable {
+        @Override
+        public void run() {
+            try {
+                System.out.println(Thread.currentThread().isInterrupted());
+                TimeUnit.SECONDS.sleep(2);
+                System.out.println("wake up");
+            } catch (InterruptedException e) {
+                System.out.println("Interrupted");
+            }
+        }
+    }
+    private static void shutdownTest() throws InterruptedException {
 
-    
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        executorService.execute(new SleepTask());
+        executorService.execute(new SleepTask());
+        TimeUnit.SECONDS.sleep(1);
+        executorService.shutdownNow();
+    }
+
+    private static class AwaitTerminationTest {
+        private static void awaitTerminationTest(long timeout, TimeUnit unit)
+                throws InterruptedException {
+            ExecutorService executorService = Executors.newFixedThreadPool(1);
+            try {
+                executorService.execute(new SleepTask());
+                executorService.execute(new SleepTask());
+            } finally {
+                executorService.shutdown();
+                executorService.awaitTermination(timeout, unit); //超时所在线程从等待中解除，任务还在执行
+                System.out.println("return from await");
+            }
+        }
+
+        public static void main(String[] args) throws InterruptedException {
+            awaitTerminationTest(1, TimeUnit.SECONDS);
+        }
+    }
 
     public static void main(String[] args) throws Exception  {
 //        executorStatus();
 //        timerTest();
 //        testScheduledThreadPool();
 //        testFutureResult();
-        completionServiceTest();
+//        completionServiceTest();
+        shutdownTest();
     }
 
 }
