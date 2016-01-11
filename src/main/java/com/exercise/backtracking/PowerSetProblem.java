@@ -55,6 +55,52 @@ public class PowerSetProblem {
         return res;
     }
 
+    /*
+    不用辅助栈
+     */
+    public static Set<Set<Integer>> powerSet1(List<Integer> originSet) {
+        Set<Set<Integer>> res = new HashSet<>();
+
+        if (originSet != null && !originSet.isEmpty()) {
+            int len;
+            int[] status = new int[len = originSet.size()]; //状态值：1 该元素在集合中；2 该元素不再集合中；
+            int k = 0;
+            while (k >= 0) {
+                ++status[k];
+                if (status[k] <= 2 && k == len -1) { //找到一个解
+                    Set<Integer> s = new HashSet<>();
+                    for (int i = 0; i < len; ++i)
+                        if (status[i] == 1)
+                            s.add(originSet.get(i));
+                    res.add(s);
+                } else {
+                    if (status[k] > 2) --k; //回溯
+                    else status[++k] = 0; //下一个
+                }
+            }
+        }
+        return res;
+    }
+
+    //因为解空间可以表示为一个满二叉树，可以用二进制数法
+    public static Set<Set<Integer>> powerSet2(List<Integer> originSet) {
+        Set<Set<Integer>> res = new HashSet<>();
+        if (originSet != null && !originSet.isEmpty()) {
+            int len = originSet.size(), max = (1 << len) - 1;
+            for (int i = 1; i <= max; ++i){
+                Set<Integer> s = new HashSet<>();
+                int temp, k = 0;
+                while ((temp = (1 << k)) < max) {
+                    if ((temp & i) == temp)
+                        s.add(originSet.get(k));
+                    ++k;
+                }
+                res.add(s);
+            }
+        }
+        return res;
+    }
+
     /**
      * 递归解法
      * @param originSet 输入集合
@@ -85,6 +131,6 @@ public class PowerSetProblem {
         powerSet(list = new ArrayList<>(Arrays.asList(1,2,3)), 0, new boolean[3], res = new HashSet<>());
         System.out.println(res);
 
-        System.out.println(powerSet(list));
+        System.out.println(powerSet2(list));
     }
 }

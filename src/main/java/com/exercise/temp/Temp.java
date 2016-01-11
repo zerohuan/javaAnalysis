@@ -1,5 +1,6 @@
 package com.exercise.temp;
 
+import java.util.Arrays;
 import java.util.Stack;
 
 /**
@@ -76,6 +77,55 @@ public final class Temp {
         public static void main(String[] args) {
             int[] o1 = {1,2,3,4,5}, o2 = {4,5,3,1,2};
             System.out.println(isPopOrder(o1, o2));
+        }
+    }
+
+    private static boolean isValid(int[] x, int n) {
+        for (int i = 0; i < n; ++i) {
+            if (x[i] == x[n] || Math.abs(n - i) == Math.abs(x[n] - x[i]))
+                return false;
+        }
+        return true;
+    }
+    private static class EightQueen {
+        private static int inQueen(int n) {
+            int[] x = new int[n];
+            int k = 0, totalCount = 0;
+            while (k >= 0) {
+                x[k]++;
+                while (x[k] <= n && !isValid(x, k))
+                    ++x[k];
+                if (x[k] <= n && k == n - 1) {
+                    ++totalCount;
+                    System.out.println(Arrays.toString(x));
+                }
+                else {
+                    if (x[k] > n) --k; //回溯，每当超过n就向前回溯，可以想象整个过程
+                    else
+                        x[++k] = 0; //准备放置下一个
+                }
+            }
+            return totalCount;
+        }
+
+        private static int rnQueen(int[] x, int k) {
+            int n, total = 0;
+            if ((n = x.length) == k) { //一个解
+                ++total;
+                System.out.println(Arrays.toString(x));
+            }
+            else {
+                for (int i = 1; i <= n; ++i) {
+                    x[k] = i;
+                    if (isValid(x, k))
+                        total += rnQueen(x, k + 1);
+                }
+            }
+            return total;
+        }
+
+        public static void main(String[] args) {
+            System.out.println(rnQueen(new int[8], 0));
         }
     }
 }

@@ -34,7 +34,9 @@ public class Permutation {
             list.add(String.valueOf(cs)); //找到一个解
         } else {
             for(int j = i; j < cs.length; ++j) {
-                if(j == i || cs[j] != cs[i]) {
+                if (i == j) {
+                    PermutationHelper(cs, i + 1, list);
+                } else if(cs[j] != cs[i]) {
                     SwapUtil.swap(cs, i, j);
                     PermutationHelper(cs, i + 1, list);
                     SwapUtil.swap(cs, i, j); //复位
