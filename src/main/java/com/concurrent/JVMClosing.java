@@ -25,6 +25,7 @@ public class JVMClosing {
         });
         daemonT.setDaemon(true);
         daemonT.start();
+        //如果没有关闭钩子，将不会等待线程结束
         Runtime.getRuntime().addShutdownHook(new Thread(task)); //将会延长JVM关闭时间，同时如果有其他线程（守护和非守护线程）都一起并发执行
         TimeUnit.SECONDS.sleep(5);
         System.exit(0);

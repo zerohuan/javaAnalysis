@@ -28,14 +28,27 @@ public class GenericShow {
                 System.out.println(element);
             }
         }
+
+        @Override
+        public Date getFirst() {
+            return super.getFirst();
+        }
     }
 
     private List<String> list;
     private List<? extends Cloneable> list2;
-
+    private static class TestA<T extends Comparable<? super T>> {
+        public T get(T t) {
+            return t;
+        }
+    }
     private void baseShow() {
         List<String> list = new ArrayList<>();
         list.add("123");
+        String s = list.get(0);
+        List<String> list1 = list;
+        TestA<String> testA = new TestA<>();
+        Comparable<String> c = testA.get("123");
     }
 
     private static <T>T backT(T...t) {
@@ -49,9 +62,9 @@ public class GenericShow {
 
     }
 
-    private static <T extends List & Serializable & Comparable> void comp2(T t) {
-        t.get(1);
-        t.compareTo(1);
+    private static <T extends List & Serializable & Comparable<? super T>> void comp2(T t1, T t2) {
+        t1.get(1);
+        t1.compareTo(t2);
     }
 
     private static <T extends HashSet & Comparable> void hc() {

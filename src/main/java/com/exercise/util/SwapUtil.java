@@ -41,4 +41,8 @@ public class SwapUtil {
                 SwapUtil.swap(seq, p, q);
         }
     }
+
+    public static boolean checkInvalidArray(int[] n) {
+        return n == null || n.length == 0;
+    }
 }
