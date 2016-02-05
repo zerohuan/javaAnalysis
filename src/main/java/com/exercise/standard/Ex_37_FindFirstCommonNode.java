@@ -50,7 +50,7 @@ public class Ex_37_FindFirstCommonNode {
         return len;
     }
 
-    public static class ListNode {
+    private static class ListNode {
         int val;
         ListNode next = null;
 
