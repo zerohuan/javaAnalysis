@@ -97,4 +97,9 @@ public class BioServer extends AbstractServer {
             ThreadPoolHolder.executor.shutdownNow();
         }
     }
+
+    public static void main(String[] args) {
+        BioServer server = new BioServer(8081);
+        server.start();
+    }
 }
