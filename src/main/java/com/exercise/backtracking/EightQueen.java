@@ -12,7 +12,7 @@ import java.util.Arrays;
  *
  * Created by yjh on 15-12-21.
  */
-public final class EightQueen {
+public final class EightQueen<U> {
     //迭代解法
     private static boolean isValid(int[] x, int k) {
         for (int i = 0; i < k; ++i)

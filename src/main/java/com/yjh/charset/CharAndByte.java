@@ -32,7 +32,7 @@ public class CharAndByte {
 
         //My environment is BigEndian
         System.out.println((0x960e));
-        System.out.println((int)'阎');
+//        System.out.println((int)'阎');
 
 
         //encode and decode
