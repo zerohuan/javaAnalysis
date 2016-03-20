@@ -50,8 +50,10 @@ public class DownLoadPDF {
 
     public List<DocLinkItem> searchByCondition(SearchCondition condition, int startPage, int itemNumber) throws InterruptedException {
         this.condition = condition;
-        page = startPage;
-        item = itemNumber;
+        if(page == 0)
+            page = startPage;
+        if(item == 0)
+            item = itemNumber;
         try {
             ResponseData responseData = requester.createExample(searchPreparedUrl.replace("%magazine_value1%", URLEncoder.encode(condition.getJournal(), "utf-8"))
                     .replace("%publishdate_from%", condition.getStartDate()).replace("%publishdate_to%", condition.getEndDate())).doGet();
@@ -77,7 +79,7 @@ public class DownLoadPDF {
             for (int i = startPage; i <= Math.ceil(((double)pageCount) / 20); i++) {
                 requester.createExample(searchPreparedUrl.replace("%magazine_value1%", URLEncoder.encode(condition.getJournal(), "utf-8"))
                         .replace("%publishdate_from%", condition.getStartDate()).replace("%publishdate_to%", condition.getEndDate())).doGet();
-                String pageUrl = listPageUrl.replace("%curpage%", startPage + "").replace("%turnpage%", (startPage - 1) + "");
+                String pageUrl = listPageUrl.replace("%curpage%", i + "").replace("%turnpage%", (i - 1) + "");
                 ResponseData listResponse = requester.createExample(pageUrl).doGet();
 
                 //解析其中的每一条搜索结果
@@ -255,9 +257,15 @@ public class DownLoadPDF {
     public static void main(String[] args) throws Exception {
         DownLoadPDF downLoadPDF = new DownLoadPDF();
         SearchCondition condition = new SearchCondition();
-        condition.setJournal("图书情报知识");
         condition.setStartDate("2005-01-01");
         condition.setEndDate("2016-03-31");
-        System.out.println(downLoadPDF.searchByCondition(condition, 34, 13));
+        condition.setJournal("中国图书馆学报");
+        downLoadPDF.searchByCondition(condition, 6, 1);
+        condition.setJournal("图书情报工作");
+        downLoadPDF.searchByCondition(condition, 1, 1);
+        condition.setJournal("情报理论与实践");
+        downLoadPDF.searchByCondition(condition, 1, 1);
+        condition.setJournal("情报杂志");
+        downLoadPDF.searchByCondition(condition, 1, 1);
     }
 }
