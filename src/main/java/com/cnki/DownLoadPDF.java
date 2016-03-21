@@ -63,6 +63,8 @@ public class DownLoadPDF {
                     TimeUnit.SECONDS.sleep(5);
                     break;
             }
+            startPage = downLoadPDF.page;
+            itemNumber = downLoadPDF.item;
             downLoadPDF = new DownLoadPDF();
         }
     }
@@ -270,7 +272,7 @@ public class DownLoadPDF {
         condition.setStartDate("2005-01-01");
         condition.setEndDate("2016-03-31");
         condition.setJournal("中国图书馆学报");
-        DownLoadPDF.downloadBySearch(condition, 56, 13);
+        DownLoadPDF.downloadBySearch(condition, 57, 7);
         condition.setJournal("图书情报工作");
         DownLoadPDF.downloadBySearch(condition, 1, 1);
         condition.setJournal("情报理论与实践");
