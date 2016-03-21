@@ -38,14 +38,20 @@ public class DownLoadPDF {
     private int page = 0;
     private int item = 0;
 
-    public void downloadBySearch(SearchCondition condition, int startPage, int itemNumber) throws InterruptedException {
+    public static void downloadBySearch(SearchCondition condition, int startPage, int itemNumber) throws InterruptedException {
         int result;
         //直到正常返回下载结束
-        while ((result = searchByCondition(condition, startPage, itemNumber)) != 0) {
+        DownLoadPDF downLoadPDF = new DownLoadPDF();
+        while ((result = downLoadPDF.searchByCondition(condition, startPage, itemNumber)) != 0) {
+            //先关闭上一个下载器
+            try {
+                downLoadPDF.requester.close();
+            } catch (IOException e) {}
+            downLoadPDF = new DownLoadPDF();
             switch (result) {
                 case 1: //IO,中断异常等其他错误
-                    System.out.println("捕捉到错误，准备释放连接，重新续接!" + condition.getJournal() + "，第" + page +
-                            " 页，第" + item + "篇");
+                    System.out.println("捕捉到错误，准备释放连接，重新续接!" + condition.getJournal() + "，第" + downLoadPDF.page +
+                            " 页，第" + downLoadPDF.item + "篇");
                     TimeUnit.SECONDS.sleep(5);
                     break;
                 case 2: //用户数并发限制
@@ -260,17 +266,14 @@ public class DownLoadPDF {
 
 
     public static void main(String[] args) throws Exception {
-        DownLoadPDF downLoadPDF = new DownLoadPDF();
         SearchCondition condition = new SearchCondition();
         condition.setStartDate("2005-01-01");
         condition.setEndDate("2016-03-31");
-        condition.setJournal("情报杂志");
-        downLoadPDF.downloadBySearch(condition, 84, 2);
-        condition.setJournal("大学图书馆学报");
-        downLoadPDF.downloadBySearch(condition, 1, 1);
-        condition.setJournal("图书情报知识");
-        downLoadPDF.downloadBySearch(condition, 1, 1);
-        condition.setJournal("国家图书馆学刊");
-        downLoadPDF.downloadBySearch(condition, 1, 1);
+        condition.setJournal("中国图书馆学报");
+        DownLoadPDF.downloadBySearch(condition, 56, 13);
+        condition.setJournal("图书情报工作");
+        DownLoadPDF.downloadBySearch(condition, 1, 1);
+        condition.setJournal("情报理论与实践");
+        DownLoadPDF.downloadBySearch(condition, 1, 1);
     }
 }
