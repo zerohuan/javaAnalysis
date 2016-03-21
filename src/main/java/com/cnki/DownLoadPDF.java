@@ -67,7 +67,7 @@ public class DownLoadPDF {
         }
     }
 
-    public int searchByCondition(SearchCondition condition, int startPage, int itemNumber) {
+    private int searchByCondition(SearchCondition condition, int startPage, int itemNumber) {
         this.condition = condition;
         if(page == 0)
             page = startPage;
@@ -141,7 +141,7 @@ public class DownLoadPDF {
 
     private static final Pattern publishYearP = Pattern.compile("(\\d+)年\\d+期");
     private final Matcher publishYearM = publishYearP.matcher("");
-    public DocForDownload pdfDownload( String detailBody, String refer) throws ConcurrentException, BadResponseException, IOException, InterruptedException {
+    private DocForDownload pdfDownload( String detailBody, String refer) throws ConcurrentException, BadResponseException, IOException, InterruptedException {
         detailBody = detailBody.replace("&#xA;                            pdf&#xA;                        ", "pdfD");
         Document doc = Jsoup.parse(detailBody);
         //标题
