@@ -1,5 +1,7 @@
 package com.cnki;
 
+import com.cnki.exception.BadResponseException;
+import com.cnki.exception.ConcurrentException;
 import com.cnki.model.DocForDownload;
 import com.fetcher.Requester;
 import com.fetcher.RequesterBuilder;
@@ -16,7 +18,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URLEncoder;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -39,16 +40,30 @@ public class DownLoadPDF {
     private int page = 0;
     private int item = 0;
 
-    public void restart()  {
-        try {
-            this.requester.close();
-            new DownLoadPDF().searchByCondition(condition, page, item);
-        } catch (Exception e) {
-            e.printStackTrace();
+    public void downloadBySearch(SearchCondition condition, int startPage, int itemNumber) throws InterruptedException {
+        int result;
+        //直到正常返回下载结束
+        while ((result = searchByCondition(condition, startPage, itemNumber)) != 0) {
+            switch (result) {
+                case 1: //IO,中断异常等其他错误
+                    System.out.println("捕捉到错误，准备释放连接，重新续接!" + condition.getJournal() + "，第" + page +
+                            " 页，第" + item + "篇");
+                    TimeUnit.SECONDS.sleep(5);
+                    break;
+                case 2: //用户数并发限制
+                    System.out.println("当前用户并发数已满！");
+                    TimeUnit.SECONDS.sleep(30);
+                    break;
+                case 3: //未取到正确的标题，响应内容错误
+                    System.out.println("no journal!");
+                    //重新开始
+                    TimeUnit.SECONDS.sleep(5);
+                    break;
+            }
         }
     }
 
-    public List<DocLinkItem> searchByCondition(SearchCondition condition, int startPage, int itemNumber) throws InterruptedException {
+    public int searchByCondition(SearchCondition condition, int startPage, int itemNumber) {
         this.condition = condition;
         if(page == 0)
             page = startPage;
@@ -76,7 +91,7 @@ public class DownLoadPDF {
             header.put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
             header.put("Host", "epub.cnki.net");
             header.put("Connection", "keep-alive");
-            for (int i = startPage; i <= Math.ceil(((double)pageCount) / 20); i++) {
+            for (int i = page; i <= Math.ceil(((double)pageCount) / 20); i++) {
                 requester.createExample(searchPreparedUrl.replace("%magazine_value1%", URLEncoder.encode(condition.getJournal(), "utf-8"))
                         .replace("%publishdate_from%", condition.getStartDate()).replace("%publishdate_to%", condition.getEndDate())).doGet();
                 String pageUrl = listPageUrl.replace("%curpage%", i + "").replace("%turnpage%", (i - 1) + "");
@@ -86,7 +101,7 @@ public class DownLoadPDF {
                 Document doc = Jsoup.parse(listResponse.getBody());
                 Elements pages = doc.select(".fz14");
                 header.put("Referer", pageUrl);
-                for (int j = itemNumber - 1; j < pages.size(); ++j) {
+                for (int j = item - 1; j < pages.size(); ++j) {
                     String docUrl = base_url + pages.get(j).attr("href");
                     ResponseData docResponse1 = requester.createExample(docUrl)
                             .setRedirectAuto(false)
@@ -108,22 +123,23 @@ public class DownLoadPDF {
                     DocForDownload docForDownload = pdfDownload(detailResponse.getBody(), realDetailUrl);
                 }
                 //只有下载第startPage是需要重指定行号开始，这里条目号必须恢复到1
-                itemNumber = 1;
+                item = 1;
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("捕捉到错误，准备释放连接，重新续接!" + condition.getJournal() + "，第" + page +
-                    " 页，第" + item + "篇");
-            //重新开始
-            TimeUnit.SECONDS.sleep(5);
-            restart();
+            if (e instanceof BadResponseException)
+                return 3;
+            else if (e instanceof ConcurrentException)
+                return 2;
+            else
+                return 1;
         }
-        return null;
+        return 0;
     }
 
     private static final Pattern publishYearP = Pattern.compile("(\\d+)年\\d+期");
     private final Matcher publishYearM = publishYearP.matcher("");
-    public DocForDownload pdfDownload( String detailBody, String refer) throws IOException, InterruptedException {
+    public DocForDownload pdfDownload( String detailBody, String refer) throws ConcurrentException, BadResponseException, IOException, InterruptedException {
         detailBody = detailBody.replace("&#xA;                            pdf&#xA;                        ", "pdfD");
         Document doc = Jsoup.parse(detailBody);
         //标题
@@ -134,11 +150,7 @@ public class DownLoadPDF {
         if(doc.select(".detailLink a").size() > 0)
             journal = doc.select(".detailLink a").get(0).text().trim();
         else {//如果没有取到标题，输出页面，直接结束
-            System.out.println("no journal!");
-            //重新开始
-            TimeUnit.SECONDS.sleep(5);
-            restart();
-            return null;
+            throw new BadResponseException();
         }
         //作者
         Elements authorInfo = doc.select(".author p");
@@ -220,10 +232,7 @@ public class DownLoadPDF {
                 String downUrl3 = pdfResponse2.getLocation();
                 if (StringUtils.isEmpty(downUrl3)) {
                     if (pdfResponse2.getBody().contains("当前用户并发数已满！")) {
-                        System.out.println("当前用户并发数已满！");
-                        TimeUnit.SECONDS.sleep(10);
-                        restart();
-                        return null;
+                        throw new ConcurrentException();
                     }
                 }
                 ResponseData pdfResponse3 = requester.createExample(downUrl3)
@@ -259,13 +268,13 @@ public class DownLoadPDF {
         SearchCondition condition = new SearchCondition();
         condition.setStartDate("2005-01-01");
         condition.setEndDate("2016-03-31");
-        condition.setJournal("中国图书馆学报");
-        downLoadPDF.searchByCondition(condition, 6, 1);
-        condition.setJournal("图书情报工作");
-        downLoadPDF.searchByCondition(condition, 1, 1);
-        condition.setJournal("情报理论与实践");
-        downLoadPDF.searchByCondition(condition, 1, 1);
         condition.setJournal("情报杂志");
+        downLoadPDF.searchByCondition(condition, 80, 12);
+        condition.setJournal("大学图书馆学报");
+        downLoadPDF.searchByCondition(condition, 1, 1);
+        condition.setJournal("图书情报知识");
+        downLoadPDF.searchByCondition(condition, 1, 1);
+        condition.setJournal("国家图书馆学刊");
         downLoadPDF.searchByCondition(condition, 1, 1);
     }
 }
