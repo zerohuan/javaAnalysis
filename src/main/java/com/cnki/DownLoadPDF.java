@@ -121,10 +121,10 @@ public class DownLoadPDF {
                             .addHeader("Connection", "keep-alive")
                             .doGet();
                     infoBuffer.setLength(0);
-                    System.out.print(infoBuffer.append("正在下载《").append(condition.getJournal())
+                    System.out.print(infoBuffer.append(condition.isNeedPDF() ? "正在下载《" : "正在更新信息《").append(condition.getJournal())
                             .append("》，第" + (page = i)).append("页，第")
                             .append(item = j + 1).append("条，"));
-                    pdfDownload(detailResponse.getBody(), realDetailUrl);
+                    pdfDownload(detailResponse.getBody(), realDetailUrl, condition.isNeedPDF());
                 }
                 //只有下载第startPage是需要重指定行号开始，这里条目号必须恢复到1
                 item = 1;
@@ -143,7 +143,8 @@ public class DownLoadPDF {
 
     private static final Pattern publishYearP = Pattern.compile("(\\d+)年\\d+期");
     private final Matcher publishYearM = publishYearP.matcher("");
-    private DocForDownload pdfDownload( String detailBody, String refer) throws ConcurrentException, BadResponseException, IOException, InterruptedException {
+    private DocForDownload pdfDownload( String detailBody, String refer, boolean needPDF)
+            throws ConcurrentException, BadResponseException, IOException, InterruptedException {
         detailBody = detailBody.replace("&#xA;                            pdf&#xA;                        ", "pdfD");
         Document doc = Jsoup.parse(detailBody);
         //标题
@@ -189,69 +190,81 @@ public class DownLoadPDF {
             }
         }
 
+        //分类号
+        String category = "";
+        Elements categoryLis = doc.select("ul.break li");
+        for (Element e : categoryLis) {
+            if (e.text().contains("【分类号】")) {
+                category = e.text().replaceAll("【分类号】","");
+            }
+        }
+
         //保存结果
         DocForDownload docPDF = new DocForDownload(title, journal, authorsA, author_corporations, date, institution);
+        docPDF.setCategory(category);
         Elements downLinks = doc.select(".pdfD");
         if(downLinks.size() > 0) {
             Element downLink = downLinks.select("a").get(0);
             String downUrl = "http://www.cnki.net" +  downLink.attr("href").trim();
             //如果没有作者那就不要下载这篇文档
             if(authorsA != null && authorsA.length > 0) {// && journalName.equals(journal)
-                //下载pdf文件
                 StringBuilder filePath = new StringBuilder();
                 String filename = StringUtil.standardFileName(docPDF.getName());
-                File pdfDoc = new File(filePath.append("/home/yjh/pdfDownload/").append(docPDF.getJournal()).append("/").append(filename).append(".pdf").toString());
-                filePath.setLength(0);
                 File txtInfo = new File(filePath.append("/home/yjh/pdfDownload/").append(docPDF.getJournal()).append("/").append(filename).append(".txt").toString());
                 filePath.setLength(0);
+                if (needPDF) {
+                    //下载pdf文件
+                    File pdfDoc = new File(filePath.append("/home/yjh/pdfDownload/").append(docPDF.getJournal()).append("/").append(filename).append(".pdf").toString());
+                    filePath.setLength(0);
 
-                if (!pdfDoc.exists()) {
-                    pdfDoc.getParentFile().mkdirs();
-                    pdfDoc.createNewFile();
-                }
-                if (!txtInfo.exists()) {
-                    txtInfo.getParentFile().mkdirs();
-                    txtInfo.createNewFile();
-                }
-
-                ResponseData pdfResponse = requester.createExample(downUrl)
-                        .setRedirectAuto(false)
-                        .addHeader("Referer", refer)
-                        .addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
-                        .addHeader("Host", "www.cnki.net")
-                        .addHeader("Connection", "keep-alive")
-                        .addParam("password", "")
-                        .addParam("username", "")
-                        .doPost();
-                String downUrl2 = pdfResponse.getLocation();
-                ResponseData pdfResponse2 = requester.createExample(downUrl2)
-                        .setRedirectAuto(false)
-                        .addHeader("Referer", refer)
-                        .addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
-                        .addHeader("Host", "www.cnki.net")
-                        .addHeader("Connection", "keep-alive")
-                        .addParam("password", "")
-                        .addParam("username", "")
-                        .doPost();
-                String downUrl3 = pdfResponse2.getLocation();
-                if (StringUtils.isEmpty(downUrl3)) {
-                    if (pdfResponse2.getBody().contains("当前用户并发数已满！")) {
-                        throw new ConcurrentException();
+                    if (!pdfDoc.exists()) {
+                        pdfDoc.getParentFile().mkdirs();
+                        pdfDoc.createNewFile();
                     }
+                    if (!txtInfo.exists()) {
+                        txtInfo.getParentFile().mkdirs();
+                        txtInfo.createNewFile();
+                    }
+
+                    ResponseData pdfResponse = requester.createExample(downUrl)
+                            .setRedirectAuto(false)
+                            .addHeader("Referer", refer)
+                            .addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+                            .addHeader("Host", "www.cnki.net")
+                            .addHeader("Connection", "keep-alive")
+                            .addParam("password", "")
+                            .addParam("username", "")
+                            .doPost();
+                    String downUrl2 = pdfResponse.getLocation();
+                    ResponseData pdfResponse2 = requester.createExample(downUrl2)
+                            .setRedirectAuto(false)
+                            .addHeader("Referer", refer)
+                            .addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+                            .addHeader("Host", "www.cnki.net")
+                            .addHeader("Connection", "keep-alive")
+                            .addParam("password", "")
+                            .addParam("username", "")
+                            .doPost();
+                    String downUrl3 = pdfResponse2.getLocation();
+                    if (StringUtils.isEmpty(downUrl3)) {
+                        if (pdfResponse2.getBody().contains("当前用户并发数已满！")) {
+                            throw new ConcurrentException();
+                        }
+                    }
+                    ResponseData pdfResponse3 = requester.createExample(downUrl3)
+                            .setRedirectAuto(false)
+                            .addHeader("Referer", refer)
+                            .addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+                            .addHeader("Connection", "keep-alive")
+                            .doGet();
+                    String downUrl4 = pdfResponse3.getLocation();
+                    requester.createExample(downUrl4)
+                            .setRedirectAuto(true)
+                            .addHeader("Referer", refer)
+                            .addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+                            .addHeader("Connection", "keep-alive")
+                            .doDownload(pdfDoc);
                 }
-                ResponseData pdfResponse3 = requester.createExample(downUrl3)
-                        .setRedirectAuto(false)
-                        .addHeader("Referer", refer)
-                        .addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
-                        .addHeader("Connection", "keep-alive")
-                        .doGet();
-                String downUrl4 = pdfResponse3.getLocation();
-                requester.createExample(downUrl4)
-                        .setRedirectAuto(true)
-                        .addHeader("Referer", refer)
-                        .addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
-                        .addHeader("Connection", "keep-alive")
-                        .doDownload(pdfDoc);
                 PrintWriter out = new PrintWriter(txtInfo);
                 out.println(docPDF);
                 out.close();
@@ -269,10 +282,12 @@ public class DownLoadPDF {
 
     public static void main(String[] args) throws Exception {
         SearchCondition condition = new SearchCondition();
-        condition.setStartDate("2005-01-01");
-        condition.setEndDate("2016-03-31");
-        condition.setJournal("中国图书馆学报");
-        DownLoadPDF.downloadBySearch(condition, 57, 7);
+        condition.setStartDate("2006-01-01");
+        condition.setEndDate("2015-12-31");
+        condition.setJournal("中国图书馆学报"); //已经下完
+        condition.setNeedPDF(false);
+        DownLoadPDF.downloadBySearch(condition, 8, 18);
+        condition.setNeedPDF(true);
         condition.setJournal("图书情报工作");
         DownLoadPDF.downloadBySearch(condition, 1, 1);
         condition.setJournal("情报理论与实践");

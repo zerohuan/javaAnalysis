@@ -12,6 +12,7 @@ public class DocForDownload {
 	private String[] author_corporation;
 	private String date = "";
 	private String institution;
+	private String category;
 	private List<Reference> refers;
 	
 	public DocForDownload() {
@@ -93,6 +94,13 @@ public class DocForDownload {
 	public void setRefers(List<Reference> refers) {
 		this.refers = refers;
 	}
+	public String getCategory() {
+		return category;
+	}
+	public void setCategory(String category) {
+		this.category = category;
+	}
+
 	public String toString() {
 		String result = "";
 		JsonOperator jsoner = new JsonOperator();

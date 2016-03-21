@@ -72,7 +72,7 @@ public class RequesterBuilder {
         RequestConfig requestConfig = RequestConfig.custom()
                 .setCookieSpec(CookieSpecs.STANDARD_STRICT)
                 .setRedirectsEnabled(true)
-                .setSocketTimeout(10000)
+                .setSocketTimeout(20000)
                 .setConnectTimeout(10000).build();
         CloseableHttpClient client = HttpClients.custom()
                 .setDefaultRequestConfig(requestConfig)

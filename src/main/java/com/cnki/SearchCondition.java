@@ -8,6 +8,7 @@ public class SearchCondition {
     private String journal;
     private String startDate;
     private String endDate;
+    private boolean needPDF = true;
 
     public String getJournal() {
         return journal;
@@ -31,5 +32,13 @@ public class SearchCondition {
 
     public void setEndDate(String endDate) {
         this.endDate = endDate;
+    }
+
+    public boolean isNeedPDF() {
+        return needPDF;
+    }
+
+    public void setNeedPDF(boolean needPDF) {
+        this.needPDF = needPDF;
     }
 }
