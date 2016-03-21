@@ -47,7 +47,6 @@ public class DownLoadPDF {
             try {
                 downLoadPDF.requester.close();
             } catch (IOException e) {}
-            downLoadPDF = new DownLoadPDF();
             switch (result) {
                 case 1: //IO,中断异常等其他错误
                     System.out.println("捕捉到错误，准备释放连接，重新续接!" + condition.getJournal() + "，第" + downLoadPDF.page +
@@ -64,6 +63,7 @@ public class DownLoadPDF {
                     TimeUnit.SECONDS.sleep(5);
                     break;
             }
+            downLoadPDF = new DownLoadPDF();
         }
     }
 
