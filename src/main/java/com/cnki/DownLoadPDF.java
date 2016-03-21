@@ -7,7 +7,6 @@ import com.fetcher.Requester;
 import com.fetcher.RequesterBuilder;
 import com.fetcher.ResponseData;
 import com.util.StringUtil;
-import com.yjh.Collections.HashMap;
 import org.apache.commons.lang.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -18,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URLEncoder;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -55,7 +53,7 @@ public class DownLoadPDF {
                     TimeUnit.SECONDS.sleep(30);
                     break;
                 case 3: //未取到正确的标题，响应内容错误
-                    System.out.println("no journal!");
+                    System.out.println("响应内容异常");
                     //重新开始
                     TimeUnit.SECONDS.sleep(5);
                     break;
@@ -87,10 +85,7 @@ public class DownLoadPDF {
                 pageCount = Integer.parseInt(pc);
 
             //处理每一页的情况
-            Map<String, String> header = new HashMap<>();
-            header.put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-            header.put("Host", "epub.cnki.net");
-            header.put("Connection", "keep-alive");
+            StringBuilder infoBuffer = new StringBuilder();
             for (int i = page; i <= Math.ceil(((double)pageCount) / 20); i++) {
                 requester.createExample(searchPreparedUrl.replace("%magazine_value1%", URLEncoder.encode(condition.getJournal(), "utf-8"))
                         .replace("%publishdate_from%", condition.getStartDate()).replace("%publishdate_to%", condition.getEndDate())).doGet();
@@ -100,12 +95,10 @@ public class DownLoadPDF {
                 //解析其中的每一条搜索结果
                 Document doc = Jsoup.parse(listResponse.getBody());
                 Elements pages = doc.select(".fz14");
-                header.put("Referer", pageUrl);
                 for (int j = item - 1; j < pages.size(); ++j) {
                     String docUrl = base_url + pages.get(j).attr("href");
                     ResponseData docResponse1 = requester.createExample(docUrl)
                             .setRedirectAuto(false)
-//                            .addHeader(header)
                             .addHeader("Referer", pageUrl)
                             .addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
                             .addHeader("Host", "epub.cnki.net")
@@ -119,12 +112,16 @@ public class DownLoadPDF {
                             .addHeader("Host", "epub.cnki.net")
                             .addHeader("Connection", "keep-alive")
                             .doGet();
-                    System.out.print("第" + (page = i) + "页，第" + (item = j + 1) + "条，");
-                    DocForDownload docForDownload = pdfDownload(detailResponse.getBody(), realDetailUrl);
+                    infoBuffer.setLength(0);
+                    System.out.print(infoBuffer.append("正在下载《").append(condition.getJournal())
+                            .append("》，第" + (page = i)).append("页，第")
+                            .append(item = j + 1).append("条，"));
+                    pdfDownload(detailResponse.getBody(), realDetailUrl);
                 }
                 //只有下载第startPage是需要重指定行号开始，这里条目号必须恢复到1
                 item = 1;
             }
+            return 0;
         } catch (Exception e) {
             e.printStackTrace();
             if (e instanceof BadResponseException)
@@ -134,7 +131,6 @@ public class DownLoadPDF {
             else
                 return 1;
         }
-        return 0;
     }
 
     private static final Pattern publishYearP = Pattern.compile("(\\d+)年\\d+期");
@@ -252,8 +248,8 @@ public class DownLoadPDF {
                 out.println(docPDF);
                 out.close();
             } else {
-                System.out.println("journalName error!");
-                TimeUnit.SECONDS.sleep(5);
+                System.out.println("跳过非文献下载项!");
+                TimeUnit.SECONDS.sleep(2);
                 return null;
             }
         } else {
@@ -269,12 +265,12 @@ public class DownLoadPDF {
         condition.setStartDate("2005-01-01");
         condition.setEndDate("2016-03-31");
         condition.setJournal("情报杂志");
-        downLoadPDF.searchByCondition(condition, 80, 12);
+        downLoadPDF.downloadBySearch(condition, 84, 2);
         condition.setJournal("大学图书馆学报");
-        downLoadPDF.searchByCondition(condition, 1, 1);
+        downLoadPDF.downloadBySearch(condition, 1, 1);
         condition.setJournal("图书情报知识");
-        downLoadPDF.searchByCondition(condition, 1, 1);
+        downLoadPDF.downloadBySearch(condition, 1, 1);
         condition.setJournal("国家图书馆学刊");
-        downLoadPDF.searchByCondition(condition, 1, 1);
+        downLoadPDF.downloadBySearch(condition, 1, 1);
     }
 }
